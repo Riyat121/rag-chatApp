@@ -11,8 +11,10 @@ import { pipeline } from "@xenova/transformers";
    const groq = new Groq(); // GROQ_API_KEY .env se lega
    const MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 const app = express();
-app.use(cors({ origin: process.env.CLIENT_URL || '*' }))
-
+const allowed = (process.env.CLIENT_URL || '').split(',').map((s) => s.trim())
+app.use(cors({
+  origin: (origin, cb) => cb(null, !origin || !allowed[0] || allowed.includes(origin)),
+}))
 app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 
